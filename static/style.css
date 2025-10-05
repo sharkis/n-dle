@@ -1,0 +1,10 @@
+html, body{
+margin:0;
+}
+body{
+background: #ccc;
+}
+.container{
+margin: 50px auto;
+width:600px;
+}
