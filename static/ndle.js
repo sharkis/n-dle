@@ -21,22 +21,29 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
   if (e.key === "Enter" || event.keyCode === 13) {
     // check word
     const testWord = document.getElementById("stdin").value;
-      // TODO: make sure input is right length
-    if (testWord !== window.ndle.curWord) {
+    // TODO: make sure input is right length
+    if (testWord.length !== window.ndle.curWord.length) {
+      // alert incorrect length
+    } else if (testWord !== window.ndle.curWord) {
       const historyEntry = document.createElement("div");
+      historyEntry = compareWords(testWord, window.ndle.curWord);
       // TODO: create colored letter indicators
       historyEntry.innerHTML = testWord;
       document.getElementById("guesshistory").appendChild(historyEntry);
       window.ndle.history.push(testWord);
       document.getElementById("stdin").value = "";
-    }
-    else{
+    } else {
       // win condition
-
     }
   }
 });
 
-function compareWords(testWord, answer){
-
+function compareWords(testWord, answer) {
+  const greenLetter = '<span class="green"></span>';
+  historyEntry = [];
+  for (i = 0; i < answer.length; i++) {
+    if (answer[i] == testWord[i]) {
+      historyEntry.push(greenLetter);
+    }
+  }
 }
