@@ -16,3 +16,15 @@ body {
   visibility: hidden;
   display: none;
 }
+.greenletter{
+  color: white;
+  background-color: lightgreen;
+}
+.yellowletter{
+  color: white;
+  background-color: gold;
+}
+.wrongletter{
+  color: white;
+  background-color: lightgrey;
+}

@@ -10,9 +10,9 @@ document.getElementById("n").addEventListener("change", async (e) => {
   window.ndle.n = e.target.value;
   const response = await fetch("//127.0.0.1:8001", {
     method: "POST",
-    body: newlength,
+    body: window.ndle.n,
   });
-  window.ndle.curWord = await response.text();
+  window.ndle.curWord = (await response.text()).trim();
   // reset input
   document.getElementById("stdin").value = "";
   document.getElementById("stdin").maxlength = window.ndle.n;
@@ -20,15 +20,15 @@ document.getElementById("n").addEventListener("change", async (e) => {
 document.getElementById("stdin").addEventListener("keyup", (e) => {
   if (e.key === "Enter" || event.keyCode === 13) {
     // check word
+    console.log("user pressed enter");
     const testWord = document.getElementById("stdin").value;
     // TODO: make sure input is right length
+    console.log(testWord.length, window.ndle.curWord.length);
     if (testWord.length !== window.ndle.curWord.length) {
       // alert incorrect length
     } else if (testWord !== window.ndle.curWord) {
-      const historyEntry = document.createElement("div");
       historyEntry = compareWords(testWord, window.ndle.curWord);
       // TODO: create colored letter indicators
-      historyEntry.innerHTML = testWord;
       document.getElementById("guesshistory").appendChild(historyEntry);
       window.ndle.history.push(testWord);
       document.getElementById("stdin").value = "";
@@ -39,11 +39,23 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
 });
 
 function compareWords(testWord, answer) {
-  const greenLetter = '<span class="green"></span>';
-  historyEntry = [];
+  console.log("comparing words", testWord, answer);
+  const historyEntry = document.createElement("div");
+  correctletters =[];
   for (i = 0; i < answer.length; i++) {
+    const letterspan = document.createElement("span");
+    // check for correct letters
+    // check remaining letters to see if there are out-of-place letters
     if (answer[i] == testWord[i]) {
-      historyEntry.push(greenLetter);
+      letterspan.className = "greenletter";
+      correctletters.push(i);
+
+    } else {
+      letterspan.className = "wrongletter";
     }
+    letterspan.innerHTML = testWord[i];
+    historyEntry.appendChild(letterspan);
   }
+  console.log("returning history entry", historyEntry);
+  return historyEntry;
 }
