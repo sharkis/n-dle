@@ -37,33 +37,32 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
 });
 
 function compareWords(testWord, answer) {
-  const colors = new Array(answer.length);
-  const t2 = []
-  const a2 = []
+  const colors = Array(answer.length).fill('gray');
+  const correct = answer.split("");
   // correct letters
   for(i=0;i<answer.length;i++){
     if(testWord[i]==answer[i]){
       colors[i]='green';
-    }
-    else{
-      t2.push(testWord[i]);
-      a2.push(answer[i]);
+      correct[i]=null;
     }
   }
   // misplaced letters
   // this needs to be a recursive thing
-  for(i=0;i<t2.length;i++){
-    if(a2.includes(t2)){
-
-
-
+  for(i=0;i<answer.length;i++){
+    if(colors[i]=='gray' && correct.includes(testWord[i])){
+      colors[i]='yellow';
+      correct[correct.indexOf(testWord[i])]=null;
     }
-
   }
 
-
-  // wrong letters
-
-
   // assemble entry
+  const entry = document.createElement("div");
+  for(i=0;i<testWord.length;i++){
+    const letter = document.createElement("span");
+    letter.textContent = testWord[i];
+    letter.style.backgroundColor = colors[i];
+    letter.style.color = "white";
+    entry.appendChild(letter);
+  }
+  return entry;
 }
