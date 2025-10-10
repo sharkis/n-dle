@@ -22,8 +22,6 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
     // check word
     console.log("user pressed enter");
     const testWord = document.getElementById("stdin").value;
-    // TODO: make sure input is right length
-    console.log(testWord.length, window.ndle.curWord.length);
     if (testWord.length !== window.ndle.curWord.length) {
       // alert incorrect length
     } else if (testWord !== window.ndle.curWord) {
@@ -39,23 +37,33 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
 });
 
 function compareWords(testWord, answer) {
-  console.log("comparing words", testWord, answer);
-  const historyEntry = document.createElement("div");
-  correctletters =[];
-  for (i = 0; i < answer.length; i++) {
-    const letterspan = document.createElement("span");
-    // check for correct letters
-    // check remaining letters to see if there are out-of-place letters
-    if (answer[i] == testWord[i]) {
-      letterspan.className = "greenletter";
-      correctletters.push(i);
-
-    } else {
-      letterspan.className = "wrongletter";
+  const colors = new Array(answer.length);
+  const t2 = []
+  const a2 = []
+  // correct letters
+  for(i=0;i<answer.length;i++){
+    if(testWord[i]==answer[i]){
+      colors[i]='green';
     }
-    letterspan.innerHTML = testWord[i];
-    historyEntry.appendChild(letterspan);
+    else{
+      t2.push(testWord[i]);
+      a2.push(answer[i]);
+    }
   }
-  console.log("returning history entry", historyEntry);
-  return historyEntry;
+  // misplaced letters
+  // this needs to be a recursive thing
+  for(i=0;i<t2.length;i++){
+    if(a2.includes(t2)){
+
+
+
+    }
+
+  }
+
+
+  // wrong letters
+
+
+  // assemble entry
 }

@@ -38,5 +38,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, hostname, () => {
-  console.log("server started");
+  console.log("server started on port " + port);
 });
