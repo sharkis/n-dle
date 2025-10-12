@@ -16,15 +16,18 @@ body {
   visibility: hidden;
   display: none;
 }
-.greenletter{
+.letter{
   color: white;
+  padding: .25em;
+  font-size: 2em;
+  line-height: 2em;
+}
+.green{
   background-color: lightgreen;
 }
-.yellowletter{
-  color: white;
+.yellow{
   background-color: gold;
 }
-.wrongletter{
-  color: white;
+.gray{
   background-color: lightgrey;
 }

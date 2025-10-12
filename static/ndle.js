@@ -7,12 +7,12 @@ window.addEventListener("load", () => {
   };
   fetchWord();
 });
-document.getElementById("n").addEventListener("change",() => {
+document.getElementById("n").addEventListener("change", () => {
   fetchWord();
 });
 document.getElementById("stdin").addEventListener("keyup", (e) => {
   if (e.key === "Enter" || event.keyCode === 13) {
-    // check if guesses remain
+    //TODO check if valid word
     // check word
     const testWord = document.getElementById("stdin").value;
     if (testWord.length !== window.ndle.curWord.length) {
@@ -22,7 +22,15 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
       document.getElementById("guesshistory").appendChild(historyEntry);
       window.ndle.history.push(testWord);
       document.getElementById("stdin").value = "";
+      // lose condition
+      if (window.ndle.history.length >= window.ndle.nguess) {
+        document.getElementById("stdin").disabled = true;
+        document.getElementById("stdout").textContent =
+          "You lose! The word was " + window.ndle.curWord;
+      }
     } else {
+      document.getElementById("stdin").disabled = true;
+      document.getElementById("stdout").textContent = "You win!";
       // win condition
     }
   }
@@ -51,14 +59,14 @@ function compareWords(testWord, answer) {
   for (i = 0; i < testWord.length; i++) {
     const letter = document.createElement("span");
     letter.textContent = testWord[i];
-    letter.style.backgroundColor = colors[i];
-    letter.style.color = "white";
+    letter.classList.add("letter");
+    letter.classList.add(colors[i]);
     entry.appendChild(letter);
   }
   return entry;
 }
 async function fetchWord(e) {
-  window.ndle.n = document.getElementById('n').value;
+  window.ndle.n = document.getElementById("n").value;
   const response = await fetch("//127.0.0.1:8001", {
     method: "POST",
     body: window.ndle.n,
