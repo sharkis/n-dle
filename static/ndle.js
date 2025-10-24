@@ -4,34 +4,44 @@ window.addEventListener("load", () => {
     curWord: "",
     nguess: 6,
     n: 5,
+    player: localStorage.getItem("playerName") || null,
   };
+  if (!window.ndle.player) {
+    const name = prompt("Enter your name:");
+    localStorage.setItem("playerName", name);
+    window.ndle.player = name;
+  }
   fetchWord();
+  loadLeaderboard(); // show leaderboard at start
 });
+
 document.getElementById("n").addEventListener("change", () => {
   fetchWord();
 });
-document.getElementById("stdin").addEventListener("keyup", (e) => {
-  if (e.key === "Enter" || event.keyCode === 13) {
-    //TODO check if valid word
-    // check word
-    const testWord = document.getElementById("stdin").value;
+
+document.getElementById("stdin").addEventListener("keyup", async (e) => {
+  if (e.key === "Enter" || e.keyCode === 13) {
+    const testWord = document.getElementById("stdin").value.trim();
     if (testWord.length !== window.ndle.curWord.length) {
-      // alert incorrect length
-    } else if (testWord !== window.ndle.curWord) {
-      historyEntry = compareWords(testWord, window.ndle.curWord);
+      alert("Incorrect length!");
+      return;
+    }
+
+    if (testWord !== window.ndle.curWord) {
+      const historyEntry = compareWords(testWord, window.ndle.curWord);
       document.getElementById("guesshistory").appendChild(historyEntry);
       window.ndle.history.push(testWord);
       document.getElementById("stdin").value = "";
-      // lose condition
+
       if (window.ndle.history.length >= window.ndle.nguess) {
-        document.getElementById("stdin").disabled = true;
-        document.getElementById("stdout").textContent =
-          "You lose! The word was " + window.ndle.curWord;
+        alert(`Out of guesses! The word was: ${window.ndle.curWord}`);
+        await saveGameResult(false);
+        fetchWord();
       }
     } else {
-      document.getElementById("stdin").disabled = true;
-      document.getElementById("stdout").textContent = "You win!";
-      // win condition
+      alert("You win!");
+      await saveGameResult(true);
+      fetchWord();
     }
   }
 });
@@ -39,40 +49,85 @@ document.getElementById("stdin").addEventListener("keyup", (e) => {
 function compareWords(testWord, answer) {
   const colors = Array(answer.length).fill("gray");
   const correct = answer.split("");
-  // correct letters
-  for (i = 0; i < answer.length; i++) {
-    if (testWord[i] == answer[i]) {
+  for (let i = 0; i < answer.length; i++) {
+    if (testWord[i] === answer[i]) {
       colors[i] = "green";
       correct[i] = null;
     }
   }
-  // misplaced letters
-  for (i = 0; i < answer.length; i++) {
-    if (colors[i] == "gray" && correct.includes(testWord[i])) {
+  for (let i = 0; i < answer.length; i++) {
+    if (colors[i] === "gray" && correct.includes(testWord[i])) {
       colors[i] = "yellow";
       correct[correct.indexOf(testWord[i])] = null;
     }
   }
 
-  // assemble entry
   const entry = document.createElement("div");
-  for (i = 0; i < testWord.length; i++) {
+  for (let i = 0; i < testWord.length; i++) {
     const letter = document.createElement("span");
     letter.textContent = testWord[i];
-    letter.classList.add("letter");
-    letter.classList.add(colors[i]);
+    letter.style.backgroundColor = colors[i];
+    letter.style.color = "white";
     entry.appendChild(letter);
   }
   return entry;
 }
-async function fetchWord(e) {
+
+async function fetchWord() {
   window.ndle.n = document.getElementById("n").value;
   const response = await fetch("//127.0.0.1:8001", {
     method: "POST",
     body: window.ndle.n,
   });
   window.ndle.curWord = (await response.text()).trim();
-  // reset input
+  window.ndle.history = [];
+  document.getElementById("guesshistory").innerHTML = "";
   document.getElementById("stdin").value = "";
   document.getElementById("stdin").maxlength = window.ndle.n;
 }
+
+/* ========== Supabase Integration ========== */
+
+// Save game result
+async function saveGameResult(solved) {
+  const guesses = window.ndle.history.length + (solved ? 1 : 0);
+  const playerName = window.ndle.player;
+
+  const { error } = await window.supabase
+    .from("games")
+    .insert([{ player_name: playerName, guesses, solved }]);
+
+  if (error) {
+    console.error("Error saving game:", error);
+  } else {
+    console.log("Game saved.");
+    loadLeaderboard();
+  }
+}
+
+// Load leaderboard
+async function loadLeaderboard() {
+  const { data, error } = await window.supabase
+    .from("games")
+    .select("player_name, guesses, solved, created_at")
+    .eq("solved", true)
+    .order("guesses", { ascending: true })
+    .limit(10);
+
+  if (error) {
+    console.error("Error loading leaderboard:", error);
+    return;
+  }
+
+  const div = document.getElementById("leaderboard");
+  if (!div) return;
+
+  div.innerHTML = "<h3>Leaderboard</h3>" +
+    data
+      .map(
+        (g, i) =>
+          `${i + 1}. ${g.player_name} — ${g.guesses} guesses`
+      )
+      .join("<br>");
+}
+

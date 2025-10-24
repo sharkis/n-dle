@@ -20,5 +20,10 @@
     </div>
 
     <script type="text/javascript" src="/ndle.js"></script>
+    <script type="module">
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+  window.supabase = createClient('https://localhost:9000', 'wharrgarbl')
+</script>
+
   </body>
 </html>
